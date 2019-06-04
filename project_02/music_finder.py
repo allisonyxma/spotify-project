@@ -108,7 +108,6 @@ def handle_genre_selection():
                             print("Only", str(num_appended), "choice(s) appended successfuly")
                         break
             
-
                   
     for gen in genres:
         temp_genre_title = list_of_genres[gen - 1]
