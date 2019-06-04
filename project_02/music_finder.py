@@ -6,13 +6,16 @@ def print_menu():
 ---------------------------------------------------------------------
 Settings / Browse Options
 ---------------------------------------------------------------------
-1 - Select your favorite genres
-2 - Select your favorite artists
+1 - Select your favorite genres {get_genres}
+2 - Select your favorite artists {get_artists}
 3 - Discover new music
 4 - Quit
 ---------------------------------------------------------------------
-    ''')
+    '''.format(
+          get_genres=display_genre, 
+          get_artists=artists))
 
+display_genre = []
 genres = []
 artists = []
 
@@ -37,7 +40,9 @@ def handle_genre_selection():
         genre_select = input('Please select up to three genres as a comma-delimited list of numbers. Type "clear" to clear out genres.')
         if genre_select == 'clear':
             genres.clear()
+            display_genre.clear()
             break
+        #temp_genres holds selection temporarily before pushing choices to global list
         temp_genres = []
         temp_num = ""
         for char in genre_select:
@@ -49,7 +54,12 @@ def handle_genre_selection():
                 break
             else:
                 if char == ',':
-                    print(temp_num)
+                    if(temp_num == ""):
+                        print("Not a valid selection")
+                        temp = True
+                        temp_genres = []
+                        temp_num = ""
+                        break
                     num = int(temp_num)
                     if num > len(list_of_genres) or num < 1:
                         print("Not a valid selection")
@@ -86,36 +96,103 @@ def handle_genre_selection():
             temp_genres = []
             temp_num = ""
         else:
+            num_appended = 0
             for n in temp_genres:
                 if n not in genres:
                     if len(genres) < 3:
                         genres.append(n)
+                        num_appended += 1
                     else:
-                        print("You may only have 3 genres")
+                        print("You may only have 3 selected genres")
+                        if num_appended > 0:
+                            print("Only", str(num_appended), "choice(s) appended successfuly")
                         break
+            
 
-
-
-        # if user input is clear, then clear
+                  
+    for gen in genres:
+        temp_genre_title = list_of_genres[gen - 1]
+        if temp_genre_title not in display_genre:
+            display_genre.append(temp_genre_title)
 
 def handle_artist_selection():
     # 1. Allow user to search for an artist using
     #    spotify.get_artists() function
     # 2. Allow user to store / modify / retrieve artists
     #    in order to get song recommendations
-
-    user_artist = str(input('Enter the name of an artist: '))
-    artist_search_results = spotify.get_artists(user_artist)
     #list_of_artist_names = artist_search_results
-    i = 0
-    while len(artist_search_results) > i:
-        num = i+1
-        print(str(num) + '. ' + str(artist_search_results[i]['name']))
-        i += 1
-    print('Please select up to three artists as a comma-delimited list of numbers. Type "clear" to clear out artists.')
-    
 
-# make sure it's simplified??
+    temp = True
+    while temp:
+        temp = False
+        user_artist = str(input('Enter the name of an artist: '))
+        artist_search_results = spotify.get_artists(user_artist)
+        i = 0
+        while len(artist_search_results) > i:
+            num = i+1
+            if num in artists:
+                print(str(num) + '. [x] ' + artist_search_results[i]['name'])
+            else:
+                print(str(num) + '. [ ] ' + artist_search_results[i]['name'])
+            i += 1
+        artist_select = input('Please select up to three artists as a comma-delimited list of numbers. Type "clear" to clear out artists.')
+        if artist_select == 'clear':
+            artists.clear()
+            break
+        temp_artists = []
+        temp_num = ""
+        for char in artist_select:
+            if (char < '0' or char > '9') and char != ',':
+                print("Error: Numbers and commas only")
+                temp = True
+                temp_artists = []
+                temp_num = ""
+                break
+            else:
+                if char == ',':
+                    print(temp_num)
+                    num = int(temp_num)
+                    if num > len(artist_search_results) or num < 1:
+                        print("Not a valid selection")
+                        temp = True
+                        temp_artists = []
+                        temp_num = ""
+                        break
+                    else:
+                        temp_artists.append(num)
+                        temp_num = ""
+                else:
+                    temp_num = temp_num + char
+        #For the last value that we miss
+        should_append = False
+        for char in temp_num:
+            if (char < '0' or char > '9') and char != ',':
+                print("Error: Numbers and commas only")
+                temp = True
+                temp_artists = []
+                break
+            elif int(temp_num) > len(artist_search_results) or int(temp_num) < 1:
+                print("Not a valid selection")
+                temp = True
+                temp_artists = []
+                break
+            else:
+                should_append = True
+        if should_append:
+            temp_artists.append(int(temp_num))
+        if len(temp_artists) > 3:
+            print("Please choose up to 3 artists")
+            temp = True
+            temp_artists = []
+            temp_num = ""
+        else:
+            for n in temp_artists:
+                if n not in artists:
+                    if len(artists) < 3:
+                        genres.append(n)
+                    else:
+                        print("You may only have 3 artists")
+                        break
 
 def get_recommendations():
     print('Handle retrieving a list of recommendations here...')
