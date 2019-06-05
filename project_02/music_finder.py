@@ -128,14 +128,11 @@ def handle_artist_selection():
         selected_numbers = artist_select.split(',')
         for i in selected_numbers:
             try:
-                print(artist_search_results[int(i)-1]['name'])
                 temp_artists += [artist_search_results[int(i)-1]['name']]
             except:
                 print('Invalid input. Try again')
                 break
         artists = list(set(artists + temp_artists))
-        print(temp_artists)
-        print(artists)
 
 def get_recommendations():
     print('Handle retrieving a list of recommendations here...')
