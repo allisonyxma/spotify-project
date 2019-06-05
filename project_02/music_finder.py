@@ -119,7 +119,7 @@ def handle_artist_selection():
         while len(artist_search_results) > i:
             num = i+1
             global artists
-            if num in artists:
+            if artist_search_results[i]['name'] in artists:
                 print(str(num) + '. [x] ' + artist_search_results[i]['name'])
             else:
                 print(str(num) + '. [ ] ' + artist_search_results[i]['name'])
