@@ -21,10 +21,6 @@ artists = []
 
 
 def handle_genre_selection():
-    # 1. Allow user to select one or more genres using the
-    #    spotify.get_genres_abridged() function
-    # 2. Allow user to store / modify / retrieve genres
-    #    in order to get song recommendations
     temp = True
     while temp:
         temp = False
@@ -42,7 +38,6 @@ def handle_genre_selection():
             genres.clear()
             display_genre.clear()
             break
-        #temp_genres holds selection temporarily before pushing choices to global list
         temp_genres = []
         temp_num = ""
         for char in genre_select:
@@ -72,8 +67,6 @@ def handle_genre_selection():
                         temp_num = ""
                 else:
                     temp_num = temp_num + char
-
-        #For the last value that we miss
         should_append = False
         for char in temp_num:
             if (char < '0' or char > '9') and char != ',':
@@ -106,29 +99,26 @@ def handle_genre_selection():
                         print("You may only have 3 selected genres")
                         if num_appended > 0:
                             print("Only", str(num_appended), "choice(s) appended successfuly")
-                        break
-            
-                  
+                        break                  
     for gen in genres:
         temp_genre_title = list_of_genres[gen - 1]
         if temp_genre_title not in display_genre:
             display_genre.append(temp_genre_title)
 
 def handle_artist_selection():
-    # 1. Allow user to search for an artist using
-    #    spotify.get_artists() function
-    # 2. Allow user to store / modify / retrieve artists
-    #    in order to get song recommendations
-    #list_of_artist_names = artist_search_results
-
     temp = True
     while temp:
         temp = False
         user_artist = str(input('Enter the name of an artist: '))
+        if user_artist == "":
+            print("Invalid input. Try again")
+            temp = True
+            continue
         artist_search_results = spotify.get_artists(user_artist)
         i = 0
         while len(artist_search_results) > i:
             num = i+1
+            global artists
             if num in artists:
                 print(str(num) + '. [x] ' + artist_search_results[i]['name'])
             else:
@@ -139,59 +129,14 @@ def handle_artist_selection():
             artists.clear()
             break
         temp_artists = []
-        temp_num = ""
-        for char in artist_select:
-            if (char < '0' or char > '9') and char != ',':
-                print("Error: Numbers and commas only")
-                temp = True
-                temp_artists = []
-                temp_num = ""
+        selected_numbers = artist_select.split(',')
+        for i in selected_numbers:
+            try:
+                temp_artists += [artist_search_results[int(i)-1]['name']]
+            except:
+                print('Invalid input. Try again')
                 break
-            else:
-                if char == ',':
-                    print(temp_num)
-                    num = int(temp_num)
-                    if num > len(artist_search_results) or num < 1:
-                        print("Not a valid selection")
-                        temp = True
-                        temp_artists = []
-                        temp_num = ""
-                        break
-                    else:
-                        temp_artists.append(num)
-                        temp_num = ""
-                else:
-                    temp_num = temp_num + char
-        #For the last value that we miss
-        should_append = False
-        for char in temp_num:
-            if (char < '0' or char > '9') and char != ',':
-                print("Error: Numbers and commas only")
-                temp = True
-                temp_artists = []
-                break
-            elif int(temp_num) > len(artist_search_results) or int(temp_num) < 1:
-                print("Not a valid selection")
-                temp = True
-                temp_artists = []
-                break
-            else:
-                should_append = True
-        if should_append:
-            temp_artists.append(int(temp_num))
-        if len(temp_artists) > 3:
-            print("Please choose up to 3 artists")
-            temp = True
-            temp_artists = []
-            temp_num = ""
-        else:
-            for n in temp_artists:
-                if n not in artists:
-                    if len(artists) < 3:
-                        genres.append(n)
-                    else:
-                        print("You may only have 3 artists")
-                        break
+        artists = list(set(artists + temp_artists))
 
 def get_recommendations():
     print('Handle retrieving a list of recommendations here...')
