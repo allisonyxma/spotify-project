@@ -140,9 +140,17 @@ def handle_artist_selection():
 
 def get_recommendations():
     print('Handle retrieving a list of recommendations here...')
-    # 1. Allow user to retrieve song recommendations using the
-    #    spotify.get_similar_tracks() function
-    # 2. List them below
+    send_email = input('Would you like to email this list to a friend (y/n)?')
+    while True:
+        if send_email == 'y' or send_email == 'Y':    
+            from_email = input('What is your email?')
+            to_emails = input('What is the email of your friend?')
+            subject = input('What would you like the subject of your email to be?')
+            html_content = input('What would you like to say to them about this playlist?')
+            sendgrid.send_mail(from_email,to_emails, subject, html_content)
+            break
+        else: 
+            break
 
 # Begin Main Program Loop:
 while True:
