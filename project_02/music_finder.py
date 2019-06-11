@@ -140,7 +140,7 @@ def handle_artist_selection():
 
 def get_recommendations():
     print('Handle retrieving a list of recommendations here...')
-    #help idk how the get recommendations thing works :-(
+    #help idk how to get the recommendations thing to work :-(
     send_email = input('Would you like to email this list to a friend (y/n)?')
     while True:
         if send_email == 'y' or send_email == 'Y':    
