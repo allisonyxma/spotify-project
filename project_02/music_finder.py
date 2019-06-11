@@ -1,5 +1,6 @@
 from apis import spotify
 from apis import sendgrid
+from apis import authentication, utilities
 
 def print_menu():
     print('''
@@ -141,6 +142,12 @@ def handle_artist_selection():
 def get_recommendations():
     print('Handle retrieving a list of recommendations here...')
     #help idk how to get the recommendations thing to work :-(
+    global artists
+    global display_genre
+    list_genres = display_genre
+    tracks = spotify.get_similar_tracks(artist_ids = artists, track_ids = [],genres = list_genres, simplify=True)
+    df = utilities.get_dataframe(tracks)
+    print(df)
     send_email = input('Would you like to email this list to a friend (y/n)?')
     while True:
         if send_email == 'y' or send_email == 'Y':    
@@ -163,9 +170,6 @@ while True:
         handle_artist_selection()
     elif choice == '3':
         get_recommendations()
-        # In addition to showing the user recommendations, allow them
-        # to email recommendations to one or more of their friends using
-        # the sendgrid.send_mail() function.
     elif choice == '4':
         print('Quitting...')
         break
