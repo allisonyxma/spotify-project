@@ -125,7 +125,7 @@ def handle_artist_selection():
                 print(str(num) + '. [ ] ' + artist_search_results[i]['name'])
             i += 1
         artist_select = input('Please select up to three artists as a comma-delimited list of numbers. Type "clear" to clear out artists.')
-        if artist_select == 'clear':
+        if artist_select == 'clear' or artist_select == 'Clear':
             artists.clear()
             break
         temp_artists = []

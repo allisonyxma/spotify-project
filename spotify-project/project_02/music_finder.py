@@ -114,9 +114,6 @@ def handle_artist_selection():
 
     def get_recommendations():
         print('Handle retrieving a list of recommendations here...')
-        # 1. Allow user to retrieve song recommendations using the
-        #    spotify.get_similar_tracks() function
-        # 2. List them below
 
     # Begin Main Program Loop:
     while True:
