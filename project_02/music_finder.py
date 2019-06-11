@@ -146,7 +146,7 @@ def get_recommendations():
             from_email = input('What is your email?')
             to_emails = input('What is the email of your friend?')
             subject = input('What would you like the subject of your email to be?')
-            html_content = input('What would you like to say to them about this playlist?')
+            html_content = input('What would you like to say to them about this playlist?') #will change this to recommendations later
             sendgrid.send_mail(from_email,to_emails, subject, html_content)
             break
         else: 
