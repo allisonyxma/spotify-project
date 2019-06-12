@@ -12,17 +12,21 @@ Settings / Browse Options
 ---------------------------------------------------------------------
 1 - Select your favorite genres {get_genres}
 2 - Select your favorite artists {get_artists}
-3 - Discover new music
-4 - Quit
+3 - Select your favorite tracks {get_tracks}
+4 - Discover new music
+5 - Quit
 ---------------------------------------------------------------------
     '''.format(
           get_genres=display_genre,
-          get_artists=artists))
+          get_artists=artists,
+          get_tracks = tracks))
 
 display_genre = []
 genres = []
 artists = []
 artist_dict = {}
+track_dict = {}
+tracks = []
 
 
 def handle_genre_selection():
@@ -129,7 +133,7 @@ def handle_artist_selection():
             else:
                 print(str(num) + '. [ ] ' + artist_search_results[i]['name'])
             i += 1
-        artist_select = input('Please select up to three artists as a comma-delimited list of numbers. Type "clear" to clear out artists.')
+        artist_select = input('Please select artists as a comma-delimited list of numbers. Type "clear" to clear out artists.')
         if artist_select == 'clear' or artist_select == 'Clear':
             artists.clear()
             artist_dict.clear()
@@ -145,10 +149,57 @@ def handle_artist_selection():
                 break
         artists = list(set(artists + temp_artists))
 
+
+def handle_track_selection():
+    temp = True
+    while temp:
+        temp = False
+        user_track = str(input("Enter the title of a track: "))
+        if user_track == "":
+            print("Invalid input. Try again")
+            temp = True
+            continue
+        track_search_results = spotify.get_tracks(user_track)
+        i = 0
+        #print(track_search_results)
+        while len(track_search_results) > i:
+            num = i + 1
+            global tracks
+            global track_dict
+            if track_search_results[i]['id'] in track_dict:
+                print(str(num) + '. [x] ' + track_search_results[i]['name'])
+            else:
+                print(str(num) + '. [ ] ' + track_search_results[i]['name'])
+            i += 1
+        track_select = input('Please select tracks as a comma-delimited list of numbers. Type "clear" to clear out tracks.')
+        if track_select == 'clear' or track_select == 'Clear':
+            tracks.clear()
+            track_dict.clear()
+            break
+        temp_tracks = []
+        selected_numbers = track_select.split(',')
+        for i in selected_numbers:
+            try:
+                temp_tracks += [track_search_results[int(i) - 1]['name']]
+                track_dict[track_search_results[int(i) - 1]['id']] = track_search_results[int(i) - 1]['name']
+            except:
+                print('Invalid input. Try again')
+                break
+        tracks = list(set(tracks + temp_tracks))
+
+
+
+
+
 def get_recommendations():
-    print('Handle retrieving a list of recommendations here...')
     artist_list = list(artist_dict.values())
-    track_list = []
+    track_list = list(track_dict.keys())
+    total_length = len(artist_list) + len(tracks) + len(display_genre)
+    if total_length < 1 or total_length > 5:
+        print("Sorry, but number of preferred genres and artists must be between 1 and 5.")
+        print("Please go back to the main menu and ensure that the amount of your preferences lies within this range")
+        return
+    print('Handle retrieving a list of recommendations here...')
     temp =  spotify.get_similar_tracks(artist_list, track_list, display_genre)
     data = {}
 
@@ -161,9 +212,9 @@ def get_recommendations():
 
     df = pd.DataFrame(track_list)
     print(df[['name', 'artist_name', 'share_url']])
-    
+
     html_content = spotify.get_formatted_tracklist_table_html(track_list)
-    
+
     #generate html file
     html_file = open('recommendedtracks.html', 'w')
     html_file.write(html_content)
@@ -191,8 +242,10 @@ while True:
     elif choice == '2':
         handle_artist_selection()
     elif choice == '3':
-        get_recommendations()
+        handle_track_selection()
     elif choice == '4':
+        get_recommendations()
+    elif choice == '5':
         print('Quitting...')
         break
     else:
