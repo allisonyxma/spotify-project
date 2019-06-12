@@ -1,10 +1,9 @@
 from apis import spotify
 from apis import sendgrid
-<<<<<<< HEAD
+
 import pandas as pd
-=======
 from apis import authentication, utilities
->>>>>>> 0873c320dfe154b24e2242311bf110264fe15f04
+
 
 def print_menu():
     print('''
@@ -152,36 +151,22 @@ def get_recommendations():
     track_list = []
     temp =  spotify.get_similar_tracks(artist_list, track_list, display_genre)
     data = {}
-    print(temp['tracks'][0])
-    print(temp['tracks'][0]['name'])
-    print(temp['tracks'][0]['artists'][0]['name'])
-    print(temp['tracks'][0]['album']['name'])
-    print(temp['tracks'][0]['album']['images'][2]['url'])
-    #print(temp['tracks'][5]['external_urls']['spotify'])
-    titles = []
-    rec_artists = []
-    album_images = []
-    albums = []
-    links = []
+
+
+    track_list = []
     for item in temp['tracks']:
-        titles.append(item['name'])
-        rec_artists.append(item['artists'][0]['name'])
-        album_images.append(item['album']['images'][2]['url'])
-        albums.append(item['album']['name'])
-        links.append(item['external_urls']['spotify'])
-    data['name'] = titles
-    data['artist_name'] = rec_artists
-    data['album_image_url_small'] = album_images
-    data['album_name'] = albums
-    data['share_url'] = links
-    df = pd.DataFrame(data)
+        new_track = {'name' : item['name'], 'artist_name' : item['artists'][0]['name'], 'album_image_url_small' : item['album']['images'][2]['url'],
+        'album_name' : item['album']['name'], 'share_url' : item['external_urls']['spotify']}
+        track_list.append(new_track)
+
+    df = pd.DataFrame(track_list)
     print(df[['name', 'artist_name', 'share_url']])
     #name = trackname
     #[arists][name] = artistname
     #[tracks][#index][album][name] = album name
     #help idk how to get the recommendations thing to work :-(
-    html_content = spotify.get_formatted_tracklist_table_html([1,2,3])
-    print(html_content)
+    html_content = spotify.get_formatted_tracklist_table_html(track_list)
+
     send_email = input('Would you like to email this list to a friend (y/n)?')
     while True:
         if send_email == 'y' or send_email == 'Y':
@@ -198,7 +183,6 @@ def get_recommendations():
 # Begin Main Program Loop:
 while True:
     print_menu()
-    print(artist_dict)
     choice = input('What would you like to do? ')
     if choice == '1':
         handle_genre_selection()
