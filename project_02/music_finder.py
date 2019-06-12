@@ -1,6 +1,10 @@
 from apis import spotify
 from apis import sendgrid
+<<<<<<< HEAD
 import pandas as pd
+=======
+from apis import authentication, utilities
+>>>>>>> 0873c320dfe154b24e2242311bf110264fe15f04
 
 def print_menu():
     print('''
@@ -202,9 +206,6 @@ while True:
         handle_artist_selection()
     elif choice == '3':
         get_recommendations()
-        # In addition to showing the user recommendations, allow them
-        # to email recommendations to one or more of their friends using
-        # the sendgrid.send_mail() function.
     elif choice == '4':
         print('Quitting...')
         break
