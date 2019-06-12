@@ -161,11 +161,13 @@ def get_recommendations():
 
     df = pd.DataFrame(track_list)
     print(df[['name', 'artist_name', 'share_url']])
-    #name = trackname
-    #[arists][name] = artistname
-    #[tracks][#index][album][name] = album name
-    #help idk how to get the recommendations thing to work :-(
+    
     html_content = spotify.get_formatted_tracklist_table_html(track_list)
+    
+    #generate html file
+    html_file = open('recommendedtracks.html', 'w')
+    html_file.write(html_content)
+    html_file.close()
 
     send_email = input('Would you like to email this list to a friend (y/n)?')
     while True:
