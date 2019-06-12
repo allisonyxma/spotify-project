@@ -1,5 +1,6 @@
 from apis import spotify
 from apis import sendgrid
+import pandas as pd
 
 def print_menu():
     print('''
@@ -12,12 +13,13 @@ Settings / Browse Options
 4 - Quit
 ---------------------------------------------------------------------
     '''.format(
-          get_genres=display_genre, 
+          get_genres=display_genre,
           get_artists=artists))
 
 display_genre = []
 genres = []
 artists = []
+artist_dict = {}
 
 
 def handle_genre_selection():
@@ -99,7 +101,7 @@ def handle_genre_selection():
                         print("You may only have 3 selected genres")
                         if num_appended > 0:
                             print("Only", str(num_appended), "choice(s) appended successfuly")
-                        break                  
+                        break
     for gen in genres:
         temp_genre_title = list_of_genres[gen - 1]
         if temp_genre_title not in display_genre:
@@ -125,14 +127,16 @@ def handle_artist_selection():
                 print(str(num) + '. [ ] ' + artist_search_results[i]['name'])
             i += 1
         artist_select = input('Please select up to three artists as a comma-delimited list of numbers. Type "clear" to clear out artists.')
-        if artist_select == 'clear':
+        if artist_select == 'clear' or artist_select == 'Clear':
             artists.clear()
+            artist_dict.clear()
             break
         temp_artists = []
         selected_numbers = artist_select.split(',')
         for i in selected_numbers:
             try:
                 temp_artists += [artist_search_results[int(i)-1]['name']]
+                artist_dict[artist_search_results[int(i)-1]['name']] = artist_search_results[int(i)-1]['id']
             except:
                 print('Invalid input. Try again')
                 break
@@ -140,13 +144,57 @@ def handle_artist_selection():
 
 def get_recommendations():
     print('Handle retrieving a list of recommendations here...')
-    # 1. Allow user to retrieve song recommendations using the
-    #    spotify.get_similar_tracks() function
-    # 2. List them below
+    artist_list = list(artist_dict.values())
+    track_list = []
+    temp =  spotify.get_similar_tracks(artist_list, track_list, display_genre)
+    data = {}
+    print(temp['tracks'][0])
+    print(temp['tracks'][0]['name'])
+    print(temp['tracks'][0]['artists'][0]['name'])
+    print(temp['tracks'][0]['album']['name'])
+    print(temp['tracks'][0]['album']['images'][2]['url'])
+    #print(temp['tracks'][5]['external_urls']['spotify'])
+    titles = []
+    rec_artists = []
+    album_images = []
+    albums = []
+    links = []
+    for item in temp['tracks']:
+        titles.append(item['name'])
+        rec_artists.append(item['artists'][0]['name'])
+        album_images.append(item['album']['images'][2]['url'])
+        albums.append(item['album']['name'])
+        links.append(item['external_urls']['spotify'])
+    data['name'] = titles
+    data['artist_name'] = rec_artists
+    data['album_image_url_small'] = album_images
+    data['album_name'] = albums
+    data['share_url'] = links
+    df = pd.DataFrame(data)
+    print(df[['name', 'artist_name', 'share_url']])
+    #name = trackname
+    #[arists][name] = artistname
+    #[tracks][#index][album][name] = album name
+    #help idk how to get the recommendations thing to work :-(
+    html_content = spotify.get_formatted_tracklist_table_html([1,2,3])
+    print(html_content)
+    send_email = input('Would you like to email this list to a friend (y/n)?')
+    while True:
+        if send_email == 'y' or send_email == 'Y':
+            from_email = input('What is your email?')
+            to_emails = input('What is the email of your friend?')
+            subject = "Playlist Recommendation (from Spotify)"
+            html_content = input('What would you like to say to them about this playlist?') + html_content
+            sendgrid.send_mail(from_email,to_emails, subject, html_content)
+            break
+        else:
+            print("Canceling...")
+            break
 
 # Begin Main Program Loop:
 while True:
     print_menu()
+    print(artist_dict)
     choice = input('What would you like to do? ')
     if choice == '1':
         handle_genre_selection()
